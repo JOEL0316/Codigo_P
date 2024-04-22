@@ -1,4 +1,7 @@
+from flask import Flask, render_template, request
 import heapq
+
+app = Flask(__name__)
 
 # Definición de la clase Nodo para representar los nodos del grafo
 class Nodo:
@@ -39,9 +42,6 @@ def busqueda_costo_uniforme(estado_inicial, objetivo, graf):
                 nuevo_nodo = Nodo(hijo, nuevo_costo, nuevo_camino)
                 heapq.heappush(nodos_frontera, nuevo_nodo)
 
-    # Si no se encuentra la solución, devolver None
-    return None, None
-
 # Ejemplo de grafo y ejecución de la búsqueda
 grafo = {
     'EDO.MEX': {'SLP': 513, 'CDMX': 125},
@@ -56,13 +56,25 @@ grafo = {
     'PUEBLA': {}
 }
 
-estado_inicial = 'EDO.MEX'
-objetivo = 'HIDALGO'
+# Tu código Flask aquí
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-camino, costo = busqueda_costo_uniforme(estado_inicial, objetivo, grafo)
+@app.route('/resultado', methods=['POST'])
+def resultado():
+    # Ejecutar la búsqueda de costo uniforme
+    estado_inicial = 'EDO.MEX'
+    objetivo = 'HIDALGO'
+    camino, costo = busqueda_costo_uniforme(estado_inicial, objetivo, grafo)
 
-if camino:
-    print("Solucion:", camino)
-    print("Costo:", costo)
-else:
-    print("No se encontró un camino hacia", objetivo)
+    if camino:
+        resultado = f"Solución: {camino} Costo: {costo}"
+    else:
+        resultado = f"No se encontró un camino hacia {objetivo}"
+
+    return resultado
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
